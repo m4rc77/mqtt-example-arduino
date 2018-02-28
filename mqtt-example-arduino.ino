@@ -175,14 +175,14 @@ void mqttPublishTemperatureAndHumidity() {
   
   Serial.print("Publishing ");Serial.print(temperature);Serial.print(" to topic ");Serial.println(mqttTopicTemperature);
   String temperatureStr = String(temperature); //converting temperature (the float variable above) to a string 
-  char charBufTemperature[temperatureStr.length()];
-  temperatureStr.toCharArray(charBufTemperature, temperatureStr.length()); //packaging up the data to publish to mqtt ...
+  char charBufTemperature[temperatureStr.length() + 1];
+  temperatureStr.toCharArray(charBufTemperature, temperatureStr.length() + 1); //packaging up the data to publish to mqtt ...
   mqttClient.publish(mqttTopicTemperature, charBufTemperature);
 
   Serial.print("Publishing ");Serial.print(humidity);Serial.print(" to topic ");Serial.println(mqttTopicHumidity);
   String humidityStr = String(humidity); //converting humidity (the float variable above) to a string 
-  char charBufHumidity[humidityStr.length()];
-  humidityStr.toCharArray(charBufHumidity, humidityStr.length()); //packaging up the data to publish to mqtt ...
+  char charBufHumidity[humidityStr.length() + 1];
+  humidityStr.toCharArray(charBufHumidity, humidityStr.length() + 1); //packaging up the data to publish to mqtt ...
   mqttClient.publish(mqttTopicHumidity, charBufHumidity);
 }
 
@@ -191,8 +191,8 @@ void mqttPublishLedState() {
   
   String ledStateStr = ledSwitchedOn ? "1" : "0"; 
   Serial.print("Publishing ");Serial.print(ledStateStr);Serial.print(" to topic ");Serial.println(mqttTopicLedStatus);
-  char charBufLed[ledStateStr.length()];
-  ledStateStr.toCharArray(charBufLed, ledStateStr.length());
+  char charBufLed[ledStateStr.length() + 1];
+  ledStateStr.toCharArray(charBufLed, ledStateStr.length() + 1);
   mqttClient.publish(mqttTopicLedStatus, charBufLed); 
 }
 
