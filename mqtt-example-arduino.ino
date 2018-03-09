@@ -23,11 +23,12 @@ const char *password   = "your WLAN password";
 const char *mqttServer = "the broker url";
 
 // see https://github.com/mqtt-smarthome/mqtt-smarthome/blob/master/Architecture.
-const char *mqttTopicTemperature = "/REPLACE_ME/status/temperature";
-const char *mqttTopicHumidity    = "/REPLACE_ME/status/humidity";
-const char *mqttTopicLedStatus   = "/REPLACE_ME/status/led";
-const char *mqttTopicLedSet      = "/REPLACE_ME/set/led";
+const char *mqttTopicTemperature = "REPLACE_ME/status/temperature";
+const char *mqttTopicHumidity    = "REPLACE_ME/status/humidity";
+const char *mqttTopicLedStatus   = "REPLACE_ME/status/led";
+const char *mqttTopicLedSet      = "REPLACE_ME/set/led";
 */
+const char *lastWillMessage = "-1"; // the last will message show clients that we are offline
 const int PUBLISH_SENSOR_DATA_DELAY = 10000; //milliseconds
 
 // Variables ...
@@ -156,9 +157,11 @@ void checkMqtt() {
   if (!mqttClient.connected()) {
     while (!mqttClient.connected()) {
       Serial.print("Attempting to open MQTT connection...");
-      if (mqttClient.connect("ESP8266_Client")) {
+      // connect with last will (QoS=1, retain=true, ) ...
+      if (mqttClient.connect("ESP8266_Client", mqttTopicLedStatus, 1, true, lastWillMessage)) {
         Serial.println("connected");
         mqttClient.subscribe(mqttTopicLedSet);
+        mqttPublishLedState();
         flashLed();
       } else {
         Serial.print("MQTT connection failed, retry count: ");
@@ -193,7 +196,8 @@ void mqttPublishLedState() {
   Serial.print("Publishing ");Serial.print(ledStateStr);Serial.print(" to topic ");Serial.println(mqttTopicLedStatus);
   char charBufLed[ledStateStr.length() + 1];
   ledStateStr.toCharArray(charBufLed, ledStateStr.length() + 1);
-  mqttClient.publish(mqttTopicLedStatus, charBufLed); 
+  // retain message ...
+  mqttClient.publish(mqttTopicLedStatus, charBufLed, true); 
 }
 
 // =================================================================================================================================
